@@ -10,6 +10,7 @@ const errorHandler = require('./error-handlers/500.js');
 const notFound = require('./error-handlers/404.js');
 const authRoutes = require('./auth/routes.js');
 const v1Routes = require('./routes/v1.js');
+const v2Routes = require('./routes/v2.js');
 
 // Prepare the express app
 const app = express();
@@ -26,6 +27,7 @@ app.use(authRoutes);
 // assuming you are on port 3001:
 // http://localhost:3001/api/v1/food
 app.use('/api/v1', v1Routes);
+app.use('/api/v2', v2Routes);
 
 // Catchalls
 app.use(notFound);
