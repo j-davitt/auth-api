@@ -1,7 +1,7 @@
 'use strict';
 
 const { app } = require('../src/server');
-const { db, users } = require('../src/auth/models');
+const { db, users } = require('../src/models');
 const supertest = require('supertest');
 const request = supertest(app);
 
@@ -26,7 +26,7 @@ describe('Server tests', () => {
     let response = await request.get('/api/v2/food').set('Authorization', `Bearer ${testWriter.token}`);
 
     expect(response.status).toEqual(200);
-    
+
   });
 
   it('allows create access', async () => {
