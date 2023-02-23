@@ -18,7 +18,7 @@ const userModel = (sequelize, DataTypes) => {
       set(tokenObj) {
         let token = jwt.sign(tokenObj, SECRET);
         return token;
-      }
+      },
     },
     capabilities: {
       type: DataTypes.VIRTUAL,
@@ -27,23 +27,33 @@ const userModel = (sequelize, DataTypes) => {
           user: ['read'],
           writer: ['read', 'create'],
           editor: ['read', 'create', 'update'],
-          admin: ['read', 'create', 'update', 'delete']
+          admin: ['read', 'create', 'update', 'delete'],
         };
         return acl[this.role];
-      }
-    }
+      },
+    },
   });
 
   model.beforeCreate(async (user) => {
-    let hashedPass = await bcrypt.hash(user.password, 10);
-    user.password = hashedPass;
+    try {
+      let hashedPass = await bcrypt.hash(user.password, 10);
+      user.password = hashedPass;
+
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   model.authenticateBasic = async function (username, password) {
-    const user = await this.findOne({ where: { username } });
-    const valid = await bcrypt.compare(password, user.password);
-    if (valid) { return user; }
-    throw new Error('Invalid User');
+    try {
+      const user = await this.findOne({ where: { username } });
+      const valid = await bcrypt.compare(password, user.password);
+      if (valid) { return user; }
+      throw new Error('Invalid User');
+
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   model.authenticateToken = async function (token) {
@@ -51,13 +61,13 @@ const userModel = (sequelize, DataTypes) => {
       const parsedToken = jwt.verify(token, SECRET);
       const user = this.findOne({where: { username: parsedToken.username } });
       if (user) { return user; }
-      throw new Error("User Not Found");
+      throw new Error('User Not Found');
     } catch (e) {
-      throw new Error(e.message)
+      throw new Error(e.message);
     }
   };
 
   return model;
-}
+};
 
 module.exports = userModel;
